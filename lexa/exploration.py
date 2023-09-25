@@ -1,5 +1,5 @@
 import tensorflow as tf
-from tensorflow.keras.mixed_precision import experimental as prec
+import tensorflow.keras.mixed_precision as prec
 from tensorflow_probability import distributions as tfd
 
 import models

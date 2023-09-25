@@ -11,7 +11,7 @@ import pickle
 import numpy as np
 import ruamel.yaml as yaml
 import tensorflow as tf
-from tensorflow.keras.mixed_precision import experimental as prec
+import tensorflow.keras.mixed_precision as prec
 from tensorflow_probability import distributions as tfd
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
@@ -294,7 +294,7 @@ def setup_dreamer(config, logdir):
       tf.config.experimental.set_memory_growth(gpu, True)
   assert config.precision in (16, 32), config.precision
   if config.precision == 16:
-    prec.set_policy(prec.Policy('mixed_float16'))
+    prec.set_global_policy(prec.Policy('mixed_float16'))
   print('Logdir', logdir)
   logdir.mkdir(parents=True, exist_ok=True)
   step = count_steps(config.traindir)

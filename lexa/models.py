@@ -1,6 +1,6 @@
 import numpy as np
 import tensorflow as tf
-from tensorflow.keras.mixed_precision import experimental as prec
+import tensorflow.keras.mixed_precision as prec
 
 import networks
 import tools

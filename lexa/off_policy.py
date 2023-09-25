@@ -1,6 +1,6 @@
 import tensorflow as tf
 import tensorflow.keras as tfk
-from tensorflow.keras.mixed_precision import experimental as prec
+import tensorflow.keras.mixed_precision as prec
 from tensorflow_probability import distributions as tfd
 
 import networks

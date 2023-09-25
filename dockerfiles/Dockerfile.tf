@@ -1,0 +1,80 @@
+FROM tensorflow/tensorflow:latest-gpu
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
+    python3 \
+    python3-pip \
+    wget \
+    curl \
+    git \
+    libgl1-mesa-dev \
+    libgl1-mesa-glx \
+    libglew-dev \
+    libosmesa6-dev \
+    software-properties-common \
+    net-tools \
+    vim \
+    virtualenv \
+    wget \
+    xpra \
+    xserver-xorg-dev \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN DEBIAN_FRONTEND=noninteractive add-apt-repository --yes ppa:deadsnakes/ppa && apt-get update && apt update
+RUN apt install -y python3.11
+RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.11 1
+RUN apt install -y python3.11-distutils
+RUN curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
+RUN python3 get-pip.py
+RUN alias python=python3
+
+# RUN curl -o /usr/local/bin/patchelf https://s3-us-west-2.amazonaws.com/openai-sci-artifacts/manual-builds/patchelf_0.9_amd64.elf \
+#     && chmod +x /usr/local/bin/patchelf
+
+RUN mkdir -p /root/.mujoco \
+    && wget https://mujoco.org/download/mujoco210-linux-x86_64.tar.gz -O mujoco.tar.gz \
+    && tar -xf mujoco.tar.gz -C /root/.mujoco \
+    && rm mujoco.tar.gz
+    
+ENV LD_LIBRARY_PATH /root/.mujoco/mujoco210/bin:${LD_LIBRARY_PATH}
+ENV LD_LIBRARY_PATH /usr/local/nvidia/lib64:${LD_LIBRARY_PATH}
+
+RUN pip3 install -U 'mujoco-py<2.2,>=2.1'
+
+WORKDIR /opt/app/
+RUN git clone https://github.com/orybkin/lexa-benchmark.git
+
+ENV PYTHONPATH=/opt/app/lexa/lexa:/opt/app/lexa-benchmark
+ENV MUJOCO_RENDERER=egl
+ENV MUJOCO_GL=egl
+
+RUN apt install build-essential
+RUN apt-get install -y python3.11-dev
+
+RUN pip install numpy --upgrade
+RUN pip install tensorflow \
+                tensorflow_probability \ 
+                pandas \
+                matplotlib \
+                ruamel.yaml \
+                numpy \
+                dm_control \
+                numba \
+                pyquaternion \
+                numpy-quaternion \
+                click \
+                termcolor \
+                gym\
+                "cython<3" \
+                patchelf \ 
+                d4rl \ 
+                opencv-python
+
+RUN apt-get install -y ffmpeg
+
+COPY . /opt/app/lexa
+WORKDIR /opt/app/lexa/lexa
+RUN mkdir logs

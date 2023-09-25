@@ -14,7 +14,7 @@ import numpy as np
 import tensorflow as tf
 import tensorflow.compat.v1 as tf1
 import tensorflow_probability as tfp
-from tensorflow.keras.mixed_precision import experimental as prec
+import tensorflow.keras.mixed_precision as prec
 from tensorflow_probability import distributions as tfd
 
 
@@ -213,7 +213,7 @@ def simulate(agent, envs, steps=0, episodes=0, state=None):
   # Initialize or unpack simulation state.
   if state is None:
     step, episode = 0, 0
-    done = np.ones(len(envs), np.bool)
+    done = np.ones(len(envs), np.bool_)
     length = np.zeros(len(envs), np.int32)
     obs = [None] * len(envs)
     agent_state = None
@@ -519,7 +519,7 @@ class Optimizer(tf.Module):
     }[opt]()
     self._mixed = (prec.global_policy().compute_dtype == tf.float16)
     if self._mixed:
-      self._opt = prec.LossScaleOptimizer(self._opt, 'dynamic')
+      self._opt = prec.LossScaleOptimizer(self._opt, True)
 
   @property
   def variables(self):
@@ -553,10 +553,10 @@ class Optimizer(tf.Module):
     metrics[f'{self._name}_loss'] = loss
     metrics[f'{self._name}_grad_norm'] = norm
     if self._mixed:
-      if tf.__version__[:3] == '2.4':
-        metrics[f'{self._name}_loss_scale'] = self._opt.loss_scale
-      else:
-        metrics[f'{self._name}_loss_scale'] = self._opt.loss_scale._current_loss_scale
+      # if tf.__version__[:3] == '2.4':
+      metrics[f'{self._name}_loss_scale'] = self._opt.loss_scale
+      # else:
+      #   metrics[f'{self._name}_loss_scale'] = self._opt.loss_scale._current_loss_scale
     return metrics
 
   def _apply_weight_decay(self, varibs):
