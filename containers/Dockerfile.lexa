@@ -67,7 +67,7 @@ RUN pip install tensorflow \
                 numpy-quaternion \
                 click \
                 termcolor \
-                gym\
+                gym \
                 "cython<3" \
                 patchelf \ 
                 d4rl \ 
@@ -75,6 +75,6 @@ RUN pip install tensorflow \
 
 RUN apt-get install -y ffmpeg
 
-COPY . /opt/app/lexa
-WORKDIR /opt/app/lexa/lexa
+COPY lexa /opt/app/lexa
+WORKDIR /opt/app/lexa
 RUN mkdir logs

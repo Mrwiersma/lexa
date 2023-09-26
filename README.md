@@ -1,3 +1,20 @@
+## Containers
+We have created a Dockerfile to reliably run LEXA on different hardware. To build the docker image, run:
+```
+docker build -f containers/Dockerfile.lexa -t lexa .
+```
+Then, run the environment with:
+```
+docker run -it lexa /bin/bash
+```
+```
+spython recipe containers/Dockerfile.lexa containers/lexa.def
+```
+Then, build the Apptainer with:
+```
+apptainer build --sandbox containers/lexa.sif containers/lexa.def
+```
+
 ## Discovering and Achieving Goals via World Models
 
 ####  [[Project Website]](https://orybkin.github.io/lexa/) [[Benchmark Code]](https://github.com/orybkin/lexa-benchmark) [[Video (2min)]](https://www.youtube.com/watch?v=LnZj2lZYD3k) [[Oral Talk (13min)]](https://www.youtube.com/watch?v=WWHlQbigQp4) [[Paper]](https://arxiv.org/pdf/2110.09514.pdf)
