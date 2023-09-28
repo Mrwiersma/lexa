@@ -1,5 +1,5 @@
 Bootstrap: docker
-From: tensorflow/tensorflow:latest-gpu
+From: tensorflow/tensorflow:2.13.0-gpu
 Stage: spython-base
 
 %files
@@ -47,6 +47,7 @@ mkdir -p /root/.mujoco \
     
 LD_LIBRARY_PATH=/root/.mujoco/mujoco210/bin:${LD_LIBRARY_PATH}
 LD_LIBRARY_PATH=/usr/local/nvidia/lib64:${LD_LIBRARY_PATH}
+MUJOCO_PY_MUJOCO_PATH=/root/.mujoco/mujoco210
 
 pip3 install -U 'mujoco-py<2.2,>=2.1'
 
@@ -82,19 +83,20 @@ opencv-python
 
 apt-get install -y ffmpeg
 
-mkdir -p /opt/app/lexa
-cd /opt/app/lexa
+mkdir -p /opt/app/lexa/lexa
+cd /opt/app/lexa/lexa
 mkdir logs
 %environment
 export DEBIAN_FRONTEND=noninteractive
 export LD_LIBRARY_PATH=/root/.mujoco/mujoco210/bin:${LD_LIBRARY_PATH}
 export LD_LIBRARY_PATH=/usr/local/nvidia/lib64:${LD_LIBRARY_PATH}
+export MUJOCO_PY_MUJOCO_PATH=/root/.mujoco/mujoco210
 export PYTHONPATH=/opt/app/lexa/lexa:/opt/app/lexa-benchmark
 export MUJOCO_RENDERER=egl
 export MUJOCO_GL=egl
 %runscript
-cd /opt/app/lexa
+cd /opt/app/lexa/lexa
 exec /bin/bash "$@"
 %startscript
-cd /opt/app/lexa
+cd /opt/app/lexa/lexa
 exec /bin/bash "$@"

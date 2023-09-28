@@ -1,4 +1,4 @@
-FROM tensorflow/tensorflow:latest-gpu
+FROM tensorflow/tensorflow:2.13.0-gpu
 
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -41,6 +41,7 @@ RUN mkdir -p /root/.mujoco \
     
 ENV LD_LIBRARY_PATH /root/.mujoco/mujoco210/bin:${LD_LIBRARY_PATH}
 ENV LD_LIBRARY_PATH /usr/local/nvidia/lib64:${LD_LIBRARY_PATH}
+ENV MUJOCO_PY_MUJOCO_PATH=/root/.mujoco/mujoco210
 
 RUN pip3 install -U 'mujoco-py<2.2,>=2.1'
 
@@ -55,7 +56,7 @@ RUN apt install build-essential
 RUN apt-get install -y python3.11-dev
 
 RUN pip install numpy --upgrade
-RUN pip install tensorflow \
+RUN pip install tensorflow==2.13.0 \
                 tensorflow_probability \ 
                 pandas \
                 matplotlib \
@@ -76,5 +77,5 @@ RUN pip install tensorflow \
 RUN apt-get install -y ffmpeg
 
 COPY lexa /opt/app/lexa
-WORKDIR /opt/app/lexa
+WORKDIR /opt/app/lexa/lexa
 RUN mkdir logs
