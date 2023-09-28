@@ -1,4 +1,5 @@
 import os
+import time
 import functools
 import tools
 import tensorflow as tf
@@ -7,8 +8,6 @@ import pickle
 import pathlib
 import off_policy
 from dreamer import Dreamer, setup_dreamer, create_envs, count_steps, make_dataset, parse_dreamer_args
-
-
 
 
 class GCDreamer(Dreamer):
@@ -84,6 +83,7 @@ def main(logdir, config):
   logdir, logger = setup_dreamer(config, logdir)
   eval_envs, eval_eps, train_envs, train_eps, acts = create_envs(config, logger)
 
+  start = time.time()
   prefill = max(0, config.prefill - count_steps(config.traindir))
   print(f'Prefill dataset ({prefill} steps).')
   random_agent = lambda o, d, s: ([acts.sample() for _ in d], s)
@@ -91,6 +91,9 @@ def main(logdir, config):
   if count_steps(config.evaldir) == 0:
     tools.simulate(random_agent, eval_envs, episodes=1)
   logger.step = config.action_repeat * count_steps(config.traindir)
+
+  t_prefill = time.time()
+  print(f"Prefill duration: {t_prefill - start}")
 
   print('Simulate agent.')
   train_dataset = make_dataset(train_eps, config)
@@ -144,6 +147,10 @@ def main(logdir, config):
 
     if not config.training:
         continue
+
+    t_simulate = time.time()
+    print(f"Simulate duration: {t_simulate - t_prefill}")
+
     print('Start training.')
     state = tools.simulate(agent, train_envs, config.eval_every, state=state)
     agent.save(logdir / 'variables.pkl')

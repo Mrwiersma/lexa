@@ -16,6 +16,9 @@ import tensorflow.compat.v1 as tf1
 import tensorflow_probability as tfp
 import tensorflow.keras.mixed_precision as prec
 from tensorflow_probability import distributions as tfd
+from tensorflow_probability.python.internal import parameter_properties
+from tensorflow_probability.python.bijectors import softplus as softplus_bijector
+from tensorflow_probability.python.internal import dtype_util
 
 
 # Patch to ignore seed to avoid synchronization across GPUs.
@@ -190,7 +193,7 @@ def encode_gif(frames, fps):
       f'-r {fps:.02f} -f gif -'])
   proc = Popen(cmd.split(' '), stdin=PIPE, stdout=PIPE, stderr=PIPE)
   for image in frames:
-    proc.stdin.write(image.tostring())
+    proc.stdin.write(image.tobytes())
   out, err = proc.communicate()
   if proc.returncode:
     raise IOError('\n'.join([' '.join(cmd), err.decode('utf8')]))
@@ -446,6 +449,18 @@ class SafeTruncatedNormal(tfd.TruncatedNormal):
     if self._mult:
       event *= self._mult
     return event
+
+  @classmethod
+  def _parameter_properties(cls, dtype, num_classes=None):
+    return dict(
+      loc=parameter_properties.ParameterProperties(),
+      scale=parameter_properties.ParameterProperties(
+        default_constraining_bijector_fn=(
+          lambda: softplus_bijector.Softplus(low=dtype_util.eps(dtype)))),
+      low=parameter_properties.ParameterProperties(),
+      high=parameter_properties.ParameterProperties(
+        default_constraining_bijector_fn=parameter_properties
+        .BIJECTOR_NOT_IMPLEMENTED, ))
 
 
 class TanhBijector(tfp.bijectors.Bijector):
