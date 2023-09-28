@@ -63,7 +63,7 @@ apt install build-essential
 apt-get install -y python3.11-dev
 
 pip install numpy --upgrade
-pip install tensorflow \
+pip install tensorflow==2.13.0 \
 tensorflow_probability \
 pandas \
 matplotlib \
